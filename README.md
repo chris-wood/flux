@@ -10,13 +10,9 @@ applications, forwarders, and (forwarding, caching, etc.) strategies.
 
 ## Workflow
 
-Flux compiles to instrumented ccnx-pktgen files. The details of these instrumented
-files can be found in the ccnx-pktgen project. 
-
-each flow has an outgoing queue
-each flow has a program counter
-each flow requires a link to operate
-flows may call one another
+Flux compiles to instrumented ccnx-pktpusher files -- what are called programmable
+packets. The details of these instrumented files can be found in the ccnx-pktpusher
+project. 
 
 ## Language Sketches
 
