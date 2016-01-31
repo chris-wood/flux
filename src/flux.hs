@@ -5,14 +5,13 @@ import Text.ParserCombinators.Parsec.Expr
 import Text.ParserCombinators.Parsec.Language
 import qualified Text.ParserCombinators.Parsec.Token as Token
 
-data BExpr = BoolConst Bool 
+data BExpr = BoolConst Bool
             | Not BExpr
             | BBinary BBinOp BExpr BExpr
             | RBinary RBinOp AExpr AExpr
             deriving (Show)
 
 data BBinOp = And | Or deriving (Show)
-
 data RBinOp = Greater | Less deriving (Show)
 
 data AExpr = Var String
@@ -20,14 +19,13 @@ data AExpr = Var String
             | Neg AExpr
             | ABinary ABinOp AExpr AExpr
             deriving (Show)
-
 data ABinOp = Add
             | Subtract
             | Multiply
             | Divide
             deriving (Show)
 
-data Stmt = Seq [Stmt] 
+data Stmt = Seq [Stmt]
             | Assign String AExpr
             | If BExpr Stmt Stmt
             | While BExpr Stmt
@@ -51,6 +49,7 @@ languageDef =
                                           , "not"
                                           , "and"
                                           , "or"
+                                          , "flow"
                                         ]
                 , Token.reservedOpNames = ["+", "-", "*", "/", ":=", "<", ">", "and", "or", "not"]
             }
@@ -71,8 +70,8 @@ whileParser = whiteSpace >> statement
 statement :: Parser Stmt
 statement = parens statement <|> sequenceOfStmt
 
-sequenceOfStmt = 
-    do 
+sequenceOfStmt =
+    do
         list <- (sepBy1 statement' semi)
         -- If there's only one statement return it without using Seq
         return $ if length list == 1 then head list else Seq list
@@ -84,8 +83,8 @@ statement' = ifStmt
             <|> assignStmt
 
 ifStmt :: Parser Stmt
-ifStmt = 
-    do 
+ifStmt =
+    do
         reserved "if"
         cond <- bExpression
         reserved "then"
@@ -95,8 +94,8 @@ ifStmt =
         return $ If cond stmt1 stmt2
 
 whileStmt :: Parser Stmt
-whileStmt = 
-    do 
+whileStmt =
+    do
         reserved "while"
         cond <- bExpression
         reserved "do"
@@ -104,10 +103,10 @@ whileStmt =
         return $ While cond stmt
 
 assignStmt :: Parser Stmt
-assignStmt = 
-    do 
+assignStmt =
+    do
         var <- identifier
-        reservedOp ":=" 
+        reservedOp ":="
         expr <- aExpression
         return $ Assign var expr
 
@@ -137,12 +136,12 @@ aTerm = parens aExpression
         <|> liftM IntConst integer
 
 bTerm = parens bExpression
-        <|> (reserved "true" >> return (BoolConst True)) 
+        <|> (reserved "true" >> return (BoolConst True))
         <|> (reserved "false" >> return (BoolConst False))
         <|> rExpression
 
-rExpression = 
-    do 
+rExpression =
+    do
         a1 <- aExpression
         op <- relation
         a2 <- aExpression
@@ -152,17 +151,15 @@ relation = (reservedOp ">" >> return Greater)
         <|> (reservedOp "<" >> return Less)
 
 parseString :: String -> Stmt
-parseString str = 
+parseString str =
     case parse whileParser "" str of
         Left e -> error $ show e
         Right r -> r
 
 parseFile :: String -> IO Stmt
 parseFile file =
-    do 
+    do
         program <- readFile file
         case parse whileParser "" program of
             Left e -> print e >> fail "parse error"
             Right r -> return r
-
-
