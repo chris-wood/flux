@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>flux by chris-wood</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="without-description">
+        <h1>flux</h1>
+        <p></p>
+        <p class="view"><a href="https://github.com/chris-wood/flux">View the Project on GitHub <small>chris-wood/flux</small></a></p>
+        <ul>
+          <li><a href="https://github.com/chris-wood/flux/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/chris-wood/flux/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/chris-wood/flux">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="flux" class="anchor" href="#flux" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>flux</h1>
+
+<h2>
+<a id="overview" class="anchor" href="#overview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Overview</h2>
+
+<p>Flux is an imperative programing language that compiles to <em>executable 
+packet flows.</em> The intent is to allow the network behavior of an application
+to be programmatically encoded without dealing with the application-layer 
+details. The ultimate goal is to enable better experimentation of CCN-based
+applications, forwarders, and (forwarding, caching, etc.) strategies. </p>
+
+<h2>
+<a id="workflow" class="anchor" href="#workflow" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Workflow</h2>
+
+<p>Flux compiles to instrumented ccnx-pktpusher files -- what are called programmable
+packets. The details of these instrumented files can be found in the ccnx-pktpusher
+project. </p>
+
+<h2>
+<a id="language-sketches" class="anchor" href="#language-sketches" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Language Sketches</h2>
+
+<h3>
+<a id="1-flux-dsl-to-specify-flows" class="anchor" href="#1-flux-dsl-to-specify-flows" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>(1) flux DSL to specify flows</h3>
+
+<ul>
+<li>specify constants for keys, certificates, etc. (key chains, names of keys, etc.)</li>
+<li>command to send interest (and specify return content size)</li>
+<li>general control flow commands (loops, conditions)</li>
+</ul>
+
+<p>key k1 = RSA("root", 1024, nil)
+key k2 = RSA("child", 1024, k1)</p>
+
+<p>// TODO</p>
+
+<p>flow flowOneName(link l) {
+    while true {
+        // send and receive explicit
+        receive(l, "/name/of/interest", nil)
+        asyncSend(l, "/name/of/interest", nil)</p>
+
+<pre><code>    // block send
+    send(l, "/name/of/interest", nil)
+
+    // delays
+    uniformWait(0.05)
+    expWait(0.05)
+}
+</code></pre>
+
+<p>}</p>
+
+<p>link l1 = Link(/prefix/) 
+flowOneName(l1)</p>
+
+<p>delay = exp(100) // uniform(100) (other distributions here)
+scheduleWithRepeat(flowOneName, l1, delay)
+schedule(flowOneName, l1, delay)</p>
+
+<h2>
+<a id="language-grammar" class="anchor" href="#language-grammar" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Language Grammar</h2>
+
+<p>a  ::= x | n | - a | a opa a
+b  ::= true | false | not b | b opb b | a opr a
+opa ::= + | - | * | /
+opb ::= and | or
+opr ::= &gt; | &lt;
+S  ::= x := a | skip | S1; S2 | ( S ) | if b then S1 else S2 | while b do S</p>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/chris-wood">chris-wood</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
