@@ -8,6 +8,12 @@ to be programmatically encoded without dealing with the application-layer
 details. The ultimate goal is to enable better experimentation of CCN-based
 applications, forwarders, and (forwarding, caching, etc.) strategies. 
 
+## Development
+
+Inspired by the following tutorial:
+
+[http://www.stephendiehl.com/llvm/#chapter-2-parser-and-ast](http://www.stephendiehl.com/llvm/#chapter-2-parser-and-ast)
+
 ## Workflow
 
 Flux compiles to instrumented ccnx-pktpusher files -- what are called programmable
@@ -50,12 +56,4 @@ delay = exp(100) // uniform(100) (other distributions here)
 scheduleWithRepeat(flowOneName, l1, delay)
 schedule(flowOneName, l1, delay)
 
-## Language Grammar 
-
-a  ::= x | n | - a | a opa a
-b  ::= true | false | not b | b opb b | a opr a
-opa ::= + | - | * | /
-opb ::= and | or
-opr ::= > | <
-S  ::= x := a | skip | S1; S2 | ( S ) | if b then S1 else S2 | while b do S
 
