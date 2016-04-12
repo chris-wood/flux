@@ -14,7 +14,8 @@ binary s f assoc = Ex.Infix (reservedOp s >> return (BinOp f)) assoc
 table = [[binary "*" Times Ex.AssocLeft,
           binary "/" Divide Ex.AssocLeft],
          [binary "+" Plus Ex.AssocLeft,
-          binary "-" Minus Ex.AssocLeft]]
+          binary "-" Minus Ex.AssocLeft],
+         [binary "<" LessThan Ex.AssocLeft]]
 
 int :: Parser Expr
 int = do
@@ -29,7 +30,7 @@ floating = do
 expr :: Parser Expr
 expr = Ex.buildExpressionParser table factor
 
-variable :: Parser Expr 
+variable :: Parser Expr
 variable = do
     var <- identifier
     return $ Var var
@@ -61,13 +62,49 @@ factor = try floating
     <|> try extern
     <|> try function
     <|> try call
+    <|> try flow
+    <|> ifthen
+    <|> for
     <|> variable
-    <|> parens expr
+    <|> (parens expr)
 
 defn :: Parser Expr
 defn = try extern
     <|> try function
     <|> expr
+
+ifthen :: Parser Expr
+ifthen = do
+    reserved "if"
+    cond <- expr
+    reserved "then"
+    tr <- expr
+    reserved "else"
+    fl <- expr
+    return $ If cond tr fl
+
+for :: Parser Expr
+for = do
+    reserved "for"
+    var <- identifier
+    reservedOp "="
+    start <- expr
+    reservedOp ","
+    cond <- expr
+    reservedOp ","
+    step <- expr
+    reserved "in"
+    body <- expr
+    return $ For var start cond step body
+
+flow :: Parser Expr
+flow = do
+    reserved "flow"
+    link <- identifier
+    reserved "{"
+    body <- expr
+    reserved "}"
+    return $ Flow link body
 
 contents :: Parser a -> Parser a
 contents p = do
@@ -87,4 +124,3 @@ parseExpr s = parse (contents expr) "<stdin>" s
 
 parseTopLevel :: String -> Either ParseError [Expr]
 parseTopLevel s = parse (contents toplevel) "<stdin>" s
-
