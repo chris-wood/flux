@@ -1,5 +1,20 @@
 import simpy
 
+class FluxEvent(object):
+    def __init__(self, event):
+        self.event = event
+
+    def add_callback(self, func):
+        def wrapper(event):
+            func(event.value)
+        self.event.callbacks.append(wrapper)
+
+    def succeed(self, param):
+        self.event.succeed(param)
+
+    def wait(self):
+        yield self.event
+
 # http://simpy.readthedocs.io/en/latest/api_reference/simpy.rt.html
 # TODO: provide similar functions for all of these methods
 class Flux(object):
@@ -10,29 +25,29 @@ class Flux(object):
         self.env.process(flow(self))
 
     def wait(self, nsecs):
-        return self.env.timeout(nsecs)
+        timeout = self.env.timeout(nsecs)
+        return timeout
 
     def run(self, nsecs):
         self.env.run(until=nsecs)
 
     def create_event(self):
-        return self.env.event()
+        return FluxEvent(self.env.event())
 
-    # def schedule(self, )
 
-# TODO: wrap the simpy event and provide a decorator that only passes in the value of the event, instead of something else
-# http://simpy.readthedocs.io/en/latest/api_reference/simpy.events.html
 def success(value):
-    print "woot!: %s" % (str(value))
+    print "woot!: %s" % (repr(value))
 
 def my_flow(flux):
     print "hello"
+
     yield flux.wait(1)
 
     event = flux.create_event()
-    event.callbacks.append(success)
+    event.add_callback(success)
     event.succeed("donezo")
-    yield event
+
+    event.wait()
 
     print "goodbye"
 
